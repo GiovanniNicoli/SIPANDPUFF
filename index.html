@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comunicatore a Scansione</title>
+<style>
+    body { 
+        font-family: sans-serif; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        margin: 0; 
+        padding: 20px;
+        background-color: #f0f0f0;
+    }
+    .screen {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 1200px;
+    }
+    .active-screen {
+        display: flex;
+    }
+    
+    .setup-panel {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 800px;
+        margin-bottom: 20px;
+    }
+    .setup-row {
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+    .menu-buttons {
+        display: flex;
+        gap: 20px;
+        width: 100%;
+        max-width: 800px;
+        justify-content: space-between;
+    }
+    .menu-btn {
+        flex: 1;
+        padding: 20px;
+        font-size: 20px;
+        cursor: pointer;
+        border: 2px solid #0056b3;
+        background-color: #e7f1ff;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+    
+    .scannable {
+        border: 4px solid #333;
+        border-radius: 10px;
+        background-color: #e0e0e0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        text-align: center;
+        box-sizing: border-box;
+        padding: 10px;
+        cursor: pointer;
+    }
+    .scannable.active {
+        background-color: #ffeb3b;
+        border-color: #d84315;
+        transform: scale(1.05);
+        z-index: 10;
+        box-shadow: 0 0 15px rgba(216, 67, 21, 0.5);
+    }
+    .back-btn {
+        width: 250px;
+        height: 60px;
+        font-size: 20px;
+        margin-bottom: 30px;
+        background-color: #ffcdd2;
+    }
+    .display-area {
+        width: 100%;
+        max-width: 800px;
+        height: 60px;
+        font-size: 28px;
+        margin-bottom: 20px;
+        text-align: center;
+        border: 2px solid #ccc;
+        line-height: 60px;
+        background-color: white;
+        border-radius: 5px;
+    }
+
+    .grid-fast {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        width: 100%;
+        max-width: 800px;
+        height: 400px;
+    }
+    .grid-fast .scannable {
+        font-size: 30px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .icon {
+        font-size: 50px;
+    }
+    
+    .grid-yesno {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        width: 100%;
+        max-width: 800px;
+        height: 400px;
+    }
+    .grid-yesno .scannable {
+        font-size: 80px;
+    }
+    .btn-yes { background-color: #c8e6c9; }
+    .btn-no { background-color: #ffccbc; }
+
+    .grid-keyboard {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 20px;
+        width: 100%;
+    }
+    .grid-keyboard .scannable {
+        width: 100%;
+        height: 80px;
+        font-size: 32px;
+    }
+    .grid-keyboard .wide {
+        grid-column: span 5;
+    }
+</style>
+</head>
+<body>
+
+<div id="screen-setup" class="screen active-screen">
+    <div class="setup-panel">
+        <h2>Impostazioni Scansione</h2>
+        <div class="setup-row">
+            <label>
+                <input type="radio" name="scanMode" value="manual" checked> 
+                Manuale (Space = Muovi, Enter = Seleziona)
+            </label>
+        </div>
+        <div class="setup-row">
+            <label>
+                <input type="radio" name="scanMode" value="auto"> 
+                Automatica (Il cursore si muove da solo, Space/Enter = Seleziona)
+            </label>
+        </div>
+        <div class="setup-row">
+            <label>
+                Velocità automatica (secondi): 
+                <input type="number" id="scanSeconds" value="1.5" step="0.5" min="0.5" style="width: 60px; font-size: 18px;">
+            </label>
+        </div>
+    </div>
+    
+    <div class="menu-buttons">
+        <button class="menu-btn" onclick="openActivity('screen-fast')">Fast Talking</button>
+        <button class="menu-btn" onclick="openActivity('screen-yesno')">Sì / No</button>
+        <button class="menu-btn" onclick="openActivity('screen-keyboard')">Tastiera</button>
+    </div>
+</div>
+
+<div id="screen-fast" class="screen">
+    <div class="display-area" id="display-fast">...</div>
+    <div class="scannable back-btn" data-action="home" data-speech="Torna alla Home">Torna alla Home</div>
+    <div class="grid-fast">
+        <div class="scannable" data-action="text" data-val="Aiuto" data-speech="Aiuto!"><span class="icon">🆘</span>Aiuto</div>
+        <div class="scannable" data-action="text" data-val="Ho sete" data-speech="Ho sete"><span class="icon">💧</span>Ho sete</div>
+        <div class="scannable" data-action="text" data-val="Vorrei essere spostato" data-speech="Vorrei essere spostato"><span class="icon">🛏️</span>Vorrei essere spostato</div>
+        <div class="scannable" data-action="text" data-val="Ho fame" data-speech="Ho fame"><span class="icon">🍔</span>Ho fame</div>
+    </div>
+</div>
+
+<div id="screen-yesno" class="screen">
+    <div class="display-area" id="display-yesno">...</div>
+    <div class="scannable back-btn" data-action="home" data-speech="Torna alla Home">Torna alla Home</div>
+    <div class="grid-yesno">
+        <div class="scannable btn-yes" data-action="text" data-val="SÌ" data-speech="Sì">SÌ</div>
+        <div class="scannable btn-no" data-action="text" data-val="NO" data-speech="No">NO</div>
+    </div>
+</div>
+
+<div id="screen-keyboard" class="screen">
+    <div class="display-area" id="display-keyboard"></div>
+    <div class="scannable back-btn" data-action="home" data-speech="Torna alla Home">Torna alla Home</div>
+    <div class="grid-keyboard" id="keyboard-container">
+    </div>
+</div>
+
+<script>
+    let mode = 'manual';
+    let delayMs = 1500;
+    let scanElements = [];
+    let currentIndex = 0;
+    let autoTimer = null;
+    let isScanning = false;
+
+    const kbContainer = document.getElementById('keyboard-container');
+    const keys = [
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+        'U', 'V', 'W', 'X', 'Y', 'Z'
+    ];
+    
+    keys.forEach(k => {
+        const el = document.createElement('div');
+        el.className = 'scannable';
+        el.dataset.action = 'type';
+        el.dataset.val = k;
+        el.dataset.speech = k;
+        el.textContent = k;
+        kbContainer.appendChild(el);
+    });
+    
+    const spaceKey = document.createElement('div');
+    spaceKey.className = 'scannable wide';
+    spaceKey.dataset.action = 'type';
+    spaceKey.dataset.val = ' ';
+    spaceKey.dataset.speech = 'Spazio';
+    spaceKey.textContent = 'SPAZIO';
+    kbContainer.appendChild(spaceKey);
+
+    const delKey = document.createElement('div');
+    delKey.className = 'scannable wide';
+    delKey.dataset.action = 'delete';
+    delKey.dataset.speech = 'Cancella';
+    delKey.textContent = 'CANC';
+    kbContainer.appendChild(delKey);
+
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'it-IT';
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function openActivity(screenId) {
+        mode = document.querySelector('input[name="scanMode"]:checked').value;
+        const sec = parseFloat(document.getElementById('scanSeconds').value);
+        delayMs = (isNaN(sec) || sec < 0.5 ? 1.5 : sec) * 1000;
+
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        const targetScreen = document.getElementById(screenId);
+        targetScreen.classList.add('active-screen');
+
+        document.querySelectorAll('.display-area').forEach(d => {
+            if(d.id === 'display-keyboard') d.textContent = '';
+            else d.textContent = '...';
+        });
+
+        scanElements = Array.from(targetScreen.querySelectorAll('.scannable'));
+        currentIndex = 0;
+        isScanning = true;
+        
+        updateHighlight();
+
+        if (mode === 'auto') {
+            clearInterval(autoTimer);
+            autoTimer = setInterval(moveNext, delayMs);
+        }
+    }
+
+    function goHome() {
+        isScanning = false;
+        clearInterval(autoTimer);
+        document.querySelectorAll('.scannable').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.getElementById('screen-setup').classList.add('active-screen');
+    }
+
+    function moveNext() {
+        currentIndex = (currentIndex + 1) % scanElements.length;
+        updateHighlight();
+    }
+
+    function updateHighlight() {
+        scanElements.forEach(el => el.classList.remove('active'));
+        if (scanElements.length > 0) {
+            scanElements[currentIndex].classList.add('active');
+        }
+    }
+
+    function selectCurrent() {
+        if (scanElements.length === 0) return;
+        
+        const selected = scanElements[currentIndex];
+        const action = selected.dataset.action;
+        const val = selected.dataset.val;
+        const speechText = selected.dataset.speech;
+
+        if (speechText) {
+            speakText(speechText);
+        }
+
+        if (action === 'home') {
+            goHome();
+            return; 
+        } else if (action === 'text') {
+            const display = selected.closest('.screen').querySelector('.display-area');
+            display.textContent = val;
+        } else if (action === 'type') {
+            const display = document.getElementById('display-keyboard');
+            display.textContent += val;
+        } else if (action === 'delete') {
+            const display = document.getElementById('display-keyboard');
+            display.textContent = display.textContent.slice(0, -1);
+        }
+
+        if (mode === 'auto' && isScanning) {
+            clearInterval(autoTimer);
+            currentIndex = 0;
+            updateHighlight();
+            autoTimer = setInterval(moveNext, delayMs);
+        }
+    }
+
+    // Intercettazione globale dei tasti fisici
+    document.addEventListener('keydown', (e) => {
+        if (!isScanning) return;
+        
+        if (mode === 'manual') {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                moveNext();
+            } else if (e.code === 'Enter') {
+                e.preventDefault();
+                selectCurrent();
+            }
+        } else if (mode === 'auto') {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                selectCurrent();
+            }
+        }
+    });
+
+    // Intercettazione dei click del mouse
+    document.addEventListener('click', (e) => {
+        if (!isScanning) return;
+        
+        const clickedEl = e.target.closest('.scannable');
+        if (clickedEl) {
+            const index = scanElements.indexOf(clickedEl);
+            if (index !== -1) {
+                currentIndex = index;
+                updateHighlight();
+                selectCurrent();
+            }
+        }
+    });
+</script>
+</body>
+</html>
