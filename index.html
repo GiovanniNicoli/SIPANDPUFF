@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comunicatore a Scansione</title>
+<title>Training Sip and Puff</title>
 <style>
     body { 
         font-family: sans-serif; 
@@ -31,7 +31,7 @@
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         width: 100%;
-        max-width: 800px;
+        max-width: 1000px;
         margin-bottom: 20px;
     }
     .setup-row {
@@ -40,13 +40,14 @@
     }
     .menu-buttons {
         display: flex;
+        flex-wrap: wrap;
         gap: 20px;
         width: 100%;
-        max-width: 800px;
-        justify-content: space-between;
+        max-width: 1000px;
+        justify-content: center;
     }
     .menu-btn {
-        flex: 1;
+        flex: 1 1 30%;
         padding: 20px;
         font-size: 20px;
         cursor: pointer;
@@ -54,6 +55,7 @@
         background-color: #e7f1ff;
         border-radius: 10px;
         font-weight: bold;
+        text-align: center;
     }
     
     .scannable {
@@ -80,12 +82,12 @@
         width: 250px;
         height: 60px;
         font-size: 20px;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
         background-color: #ffcdd2;
     }
     .display-area {
         width: 100%;
-        max-width: 800px;
+        max-width: 1000px;
         height: 60px;
         font-size: 28px;
         margin-bottom: 20px;
@@ -101,7 +103,7 @@
         grid-template-columns: 1fr 1fr;
         gap: 30px;
         width: 100%;
-        max-width: 800px;
+        max-width: 1000px;
         height: 400px;
     }
     .grid-fast .scannable {
@@ -109,21 +111,17 @@
         flex-direction: column;
         gap: 15px;
     }
-    .icon {
-        font-size: 50px;
-    }
+    .icon { font-size: 50px; }
     
     .grid-yesno {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 40px;
         width: 100%;
-        max-width: 800px;
+        max-width: 1000px;
         height: 400px;
     }
-    .grid-yesno .scannable {
-        font-size: 80px;
-    }
+    .grid-yesno .scannable { font-size: 80px; }
     .btn-yes { background-color: #c8e6c9; }
     .btn-no { background-color: #ffccbc; }
 
@@ -132,14 +130,109 @@
         grid-template-columns: repeat(10, 1fr);
         gap: 20px;
         width: 100%;
+        max-width: 1000px;
     }
     .grid-keyboard .scannable {
         width: 100%;
         height: 80px;
         font-size: 32px;
     }
-    .grid-keyboard .wide {
-        grid-column: span 5;
+    .grid-keyboard .wide { grid-column: span 5; }
+
+    .interactive-area {
+        position: relative;
+        width: 100%;
+        max-width: 1000px;
+        height: 500px;
+        background: #87CEEB;
+        border: 4px solid #333;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    /* Corsa Ostacoli */
+    #ground-run {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 60px;
+        background: #8B4513;
+        border-top: 10px solid #228B22;
+    }
+    #runner {
+        position: absolute;
+        bottom: 70px;
+        left: 50px;
+        font-size: 70px;
+        line-height: 1;
+        display: inline-block;
+        transform: scaleX(-1);
+    }
+    #obstacle {
+        position: absolute;
+        bottom: 70px;
+        left: 1000px;
+        font-size: 60px;
+        line-height: 1;
+    }
+    .score-board {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 32px;
+        font-weight: bold;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 5px 20px;
+        border-radius: 10px;
+        border: 2px solid #333;
+        z-index: 5;
+    }
+
+    /* Rigori in Canvas - Stili posizionamento scritte */
+    .penalty-score-board {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 32px;
+        font-weight: bold;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 5px 20px;
+        border-radius: 10px;
+        border: 2px solid #333;
+        z-index: 10;
+        pointer-events: none;
+    }
+    .side-indicator-left {
+        position: absolute;
+        top: 200px;
+        left: 20px;
+        font-size: 26px;
+        font-weight: bold;
+        color: #333;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-align: center;
+        border: 2px solid #333;
+        z-index: 10;
+        pointer-events: none;
+    }
+    .side-indicator-right {
+        position: absolute;
+        top: 200px;
+        right: 20px;
+        font-size: 26px;
+        font-weight: bold;
+        color: #333;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-align: center;
+        border: 2px solid #333;
+        z-index: 10;
+        pointer-events: none;
     }
 </style>
 </head>
@@ -147,17 +240,17 @@
 
 <div id="screen-setup" class="screen active-screen">
     <div class="setup-panel">
-        <h2>Impostazioni Scansione</h2>
+        <h2>Impostazioni Scansione e Attività</h2>
         <div class="setup-row">
             <label>
                 <input type="radio" name="scanMode" value="manual" checked> 
-                Manuale (Space = Muovi, Enter = Seleziona)
+                Scansione Manuale (Space = Muovi, Enter = Seleziona)
             </label>
         </div>
         <div class="setup-row">
             <label>
                 <input type="radio" name="scanMode" value="auto"> 
-                Automatica (Il cursore si muove da solo, Space/Enter = Seleziona)
+                Scansione Automatica (Cursore automatico, Space/Enter = Seleziona)
             </label>
         </div>
         <div class="setup-row">
@@ -172,12 +265,14 @@
         <button class="menu-btn" onclick="openActivity('screen-fast')">Fast Talking</button>
         <button class="menu-btn" onclick="openActivity('screen-yesno')">Sì / No</button>
         <button class="menu-btn" onclick="openActivity('screen-keyboard')">Tastiera</button>
+        <button class="menu-btn" onclick="openActivity('screen-run')" style="background-color: #fff3cd; border-color: #ffc107;">Corsa Ostacoli</button>
+        <button class="menu-btn" onclick="openActivity('screen-penalty')" style="background-color: #d1e7dd; border-color: #198754;">Calci di Rigore</button>
     </div>
 </div>
 
 <div id="screen-fast" class="screen">
     <div class="display-area" id="display-fast">...</div>
-    <div class="scannable back-btn" data-action="home" data-speech="Torna alla Home">Torna alla Home</div>
+    <div class="scannable back-btn" data-action="home" data-speech="Torna alla Home" onclick="goHome()">Torna alla Home</div>
     <div class="grid-fast">
         <div class="scannable" data-action="text" data-val="Aiuto" data-speech="Aiuto!"><span class="icon">🆘</span>Aiuto</div>
         <div class="scannable" data-action="text" data-val="Ho sete" data-speech="Ho sete"><span class="icon">💧</span>Ho sete</div>
@@ -188,7 +283,7 @@
 
 <div id="screen-yesno" class="screen">
     <div class="display-area" id="display-yesno">...</div>
-    <div class="scannable back-btn" data-action="home" data-speech="Torna alla Home">Torna alla Home</div>
+    <div class="scannable back-btn" data-action="home" data-speech="Torna alla Home" onclick="goHome()">Torna alla Home</div>
     <div class="grid-yesno">
         <div class="scannable btn-yes" data-action="text" data-val="SÌ" data-speech="Sì">SÌ</div>
         <div class="scannable btn-no" data-action="text" data-val="NO" data-speech="No">NO</div>
@@ -197,18 +292,73 @@
 
 <div id="screen-keyboard" class="screen">
     <div class="display-area" id="display-keyboard"></div>
-    <div class="scannable back-btn" data-action="home" data-speech="Torna alla Home">Torna alla Home</div>
+    <div class="scannable back-btn" data-action="home" data-speech="Torna alla Home" onclick="goHome()">Torna alla Home</div>
     <div class="grid-keyboard" id="keyboard-container">
     </div>
 </div>
 
+<div id="screen-run" class="screen">
+    <div class="display-area" id="display-run">In corsa...</div>
+    <div class="scannable back-btn" data-action="home" onclick="goHome()">Torna alla Home</div>
+    <div class="interactive-area">
+        <div class="score-board" id="run-score">Punti: 0</div>
+        <div id="ground-run"></div>
+        <div id="obstacle">🚧</div>
+        <div id="runner">🏃</div>
+    </div>
+</div>
+
+<div id="screen-penalty" class="screen">
+    <div class="display-area" id="display-penalty">Scegli la direzione</div>
+    <div class="scannable back-btn" data-action="home" onclick="goHome()">Torna alla Home</div>
+    
+    <div class="interactive-area" style="padding: 0; background: transparent; border: none;">
+        <div class="penalty-score-board" id="penalty-score">Gol: 0 - Parate: 0</div>
+        <div class="side-indicator-left">SOFFIO<br>(Invio)</div>
+        <div class="side-indicator-right">SORSO<br>(Spazio)</div>
+        <canvas id="penaltyCanvas" width="1000" height="500" style="border-radius: 10px; border: 4px solid #333; display: block; max-width: 100%; height: auto;"></canvas>
+    </div>
+</div>
+
 <script>
+    let currentAppMode = null; 
     let mode = 'manual';
     let delayMs = 1500;
+    
     let scanElements = [];
     let currentIndex = 0;
     let autoTimer = null;
-    let isScanning = false;
+    
+    let isSpaceLocked = false;
+    let isEnterLocked = false;
+
+    // Motore Fisico Corsa
+    let runAnimationFrame;
+    let rY = 0;
+    let rVy = 0;
+    let obsX = 1000;
+    let runScore = 0;
+    let runState = 'moving'; 
+    const gravity = 0.6;
+    const jumpPower = 16;
+    const runSpeed = 7;
+    const obstacleStopX = 140; 
+
+    // Motore Fisico Rigori (Canvas)
+    let pAnimFrame;
+    const canvas = document.getElementById('penaltyCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let pState = 'idle'; // idle, kicked, result
+    let pProgress = 0;
+    let pGoals = 0;
+    let pSaves = 0;
+    
+    let ball = { x: 500, y: 430, startX: 500, startY: 430, targetX: 500, targetY: 150, r: 25 };
+    let gk = { x: 500, y: 180, startX: 500, targetX: 500, diveOffset: 0, width: 80, height: 120 };
+    
+    let kickDir = '';
+    let gkDir = '';
 
     const kbContainer = document.getElementById('keyboard-container');
     const keys = [
@@ -262,24 +412,38 @@
 
         document.querySelectorAll('.display-area').forEach(d => {
             if(d.id === 'display-keyboard') d.textContent = '';
+            else if(d.id === 'display-run') d.textContent = 'In corsa...';
+            else if(d.id === 'display-penalty') d.textContent = 'Scegli la direzione (Sorso o Soffio)';
             else d.textContent = '...';
         });
 
-        scanElements = Array.from(targetScreen.querySelectorAll('.scannable'));
-        currentIndex = 0;
-        isScanning = true;
-        
-        updateHighlight();
+        isSpaceLocked = false;
+        isEnterLocked = false;
 
-        if (mode === 'auto') {
-            clearInterval(autoTimer);
-            autoTimer = setInterval(moveNext, delayMs);
+        if (screenId === 'screen-run') {
+            currentAppMode = 'run';
+            initRun();
+        } else if (screenId === 'screen-penalty') {
+            currentAppMode = 'penalty';
+            initPenalty();
+        } else {
+            currentAppMode = 'scan';
+            scanElements = Array.from(targetScreen.querySelectorAll('.scannable'));
+            currentIndex = 0;
+            updateHighlight();
+            if (mode === 'auto') {
+                clearInterval(autoTimer);
+                autoTimer = setInterval(moveNext, delayMs);
+            }
         }
     }
 
     function goHome() {
-        isScanning = false;
+        currentAppMode = null;
         clearInterval(autoTimer);
+        cancelAnimationFrame(runAnimationFrame);
+        cancelAnimationFrame(pAnimFrame);
+        
         document.querySelectorAll('.scannable').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
         document.getElementById('screen-setup').classList.add('active-screen');
@@ -305,9 +469,7 @@
         const val = selected.dataset.val;
         const speechText = selected.dataset.speech;
 
-        if (speechText) {
-            speakText(speechText);
-        }
+        if (speechText) speakText(speechText);
 
         if (action === 'home') {
             goHome();
@@ -323,7 +485,7 @@
             display.textContent = display.textContent.slice(0, -1);
         }
 
-        if (mode === 'auto' && isScanning) {
+        if (mode === 'auto' && currentAppMode === 'scan') {
             clearInterval(autoTimer);
             currentIndex = 0;
             updateHighlight();
@@ -331,37 +493,305 @@
         }
     }
 
-    // Intercettazione globale dei tasti fisici
-    document.addEventListener('keydown', (e) => {
-        if (!isScanning) return;
+    // --- Motore Corsa ---
+    function initRun() {
+        runScore = 0;
+        rY = 0;
+        rVy = 0;
+        obsX = 1000;
+        runState = 'moving';
+        document.getElementById('run-score').textContent = 'Punti: 0';
+        document.getElementById('display-run').textContent = 'In corsa...';
+        cancelAnimationFrame(runAnimationFrame);
+        runLoop();
+    }
+
+    function runLoop() {
+        if (currentAppMode !== 'run') return;
+
+        rY += rVy;
+        rVy -= gravity;
         
-        if (mode === 'manual') {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                moveNext();
-            } else if (e.code === 'Enter') {
-                e.preventDefault();
+        if (rY <= 0) {
+            rY = 0;
+            rVy = 0;
+            if (runState === 'jumping') {
+                runState = 'moving';
+                document.getElementById('display-run').textContent = 'In corsa...';
+            }
+        }
+
+        if (runState === 'moving') {
+            obsX -= runSpeed;
+            if (obsX <= obstacleStopX) {
+                obsX = obstacleStopX;
+                runState = 'stopped';
+                document.getElementById('display-run').textContent = 'Ostacolo! Premi Invio (Puff)';
+            }
+        } else if (runState === 'jumping') {
+            obsX -= runSpeed;
+        }
+
+        if (obsX < -100) {
+            obsX = 1000;
+            runScore++;
+            document.getElementById('run-score').textContent = 'Punti: ' + runScore;
+        }
+
+        document.getElementById('runner').style.bottom = (70 + rY) + 'px';
+        document.getElementById('obstacle').style.left = obsX + 'px';
+
+        runAnimationFrame = requestAnimationFrame(runLoop);
+    }
+
+    function handleRunAction(key) {
+        if (key === 'Enter' && rY === 0) {
+            rVy = jumpPower;
+            runState = 'jumping';
+            document.getElementById('display-run').textContent = 'Salto!';
+        }
+    }
+
+    // --- Motore Rigori (HTML5 Canvas) ---
+    function initPenalty() {
+        cancelAnimationFrame(pAnimFrame);
+        pState = 'idle';
+        pProgress = 0;
+        
+        ball.x = 500;
+        ball.y = 430;
+        ball.r = 25;
+        
+        gk.x = 500;
+        gk.y = 180;
+        gk.diveOffset = 0;
+        
+        document.getElementById('display-penalty').textContent = 'Scegli la direzione (Sorso o Soffio)';
+        drawPenaltyScene();
+    }
+
+    function handlePenaltyAction(key) {
+        if (pState !== 'idle') return;
+        if (key !== 'Space' && key !== 'Enter') return;
+        
+        pState = 'kicked';
+        pProgress = 0;
+        
+        ball.startX = ball.x;
+        ball.startY = ball.y;
+        gk.startX = gk.x;
+        
+        kickDir = (key === 'Space') ? 'right' : 'left'; 
+        gkDir = Math.random() > 0.5 ? 'right' : 'left';
+        
+        ball.targetX = (kickDir === 'right') ? 750 : 250;
+        ball.targetY = 160; 
+        
+        gk.targetX = (gkDir === 'right') ? 700 : 300;
+        
+        document.getElementById('display-penalty').textContent = 'Tiro in corso...';
+        penaltyLoop();
+    }
+
+    function penaltyLoop() {
+        if (currentAppMode !== 'penalty') return;
+
+        if (pState === 'kicked') {
+            pProgress += 0.025; 
+            
+            if (pProgress >= 1) {
+                pProgress = 1;
+                pState = 'result';
+                evaluatePenalty();
+            }
+            
+            let linearY = ball.startY + (ball.targetY - ball.startY) * pProgress;
+            let arc = Math.sin(pProgress * Math.PI) * 120; 
+            ball.x = ball.startX + (ball.targetX - ball.startX) * pProgress;
+            ball.y = linearY - arc;
+            ball.r = 25 - (12 * pProgress); 
+            
+            gk.x = gk.startX + (gk.targetX - gk.startX) * pProgress;
+            gk.diveOffset = Math.sin(pProgress * Math.PI) * 40; 
+        }
+
+        drawPenaltyScene();
+
+        if (pState !== 'result') {
+            pAnimFrame = requestAnimationFrame(penaltyLoop);
+        }
+    }
+
+    function drawPenaltyScene() {
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        for (let i = 0; i < 10; i++) {
+            ctx.fillStyle = (i % 2 === 0) ? '#228B22' : '#2E8B57';
+            ctx.fillRect(0, 150 + (i * 35), canvas.width, 35);
+        }
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for(let i = 150; i <= 850; i += 20) {
+            ctx.moveTo(i, 50);
+            ctx.lineTo(i, 200);
+        }
+        for(let i = 50; i <= 200; i += 20) {
+            ctx.moveTo(150, i);
+            ctx.lineTo(850, i);
+        }
+        ctx.stroke();
+
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(130, 40, 20, 180); 
+        ctx.fillRect(850, 40, 20, 180); 
+        ctx.fillRect(130, 30, 740, 20); 
+
+        drawGoalkeeper();
+        drawBall();
+    }
+
+    function drawGoalkeeper() {
+        ctx.save();
+        ctx.translate(gk.x, gk.y - gk.diveOffset);
+        
+        if (pState === 'kicked') {
+            let angle = (gkDir === 'right') ? pProgress * 1.5 : -pProgress * 1.5;
+            ctx.rotate(angle);
+        }
+
+        ctx.fillStyle = '#ff4500'; 
+        ctx.fillRect(-gk.width/2, 0, gk.width, gk.height - 40);
+        
+        ctx.fillStyle = '#000';
+        ctx.fillRect(-gk.width/2, gk.height - 40, gk.width, 40);
+
+        ctx.fillStyle = '#ffccaa';
+        ctx.beginPath();
+        ctx.arc(0, -25, 25, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ff4500';
+        if (pState === 'idle') {
+            ctx.fillRect(-gk.width/2 - 20, 0, 20, 60); 
+            ctx.fillRect(gk.width/2, 0, 20, 60);       
+        } else {
+            ctx.fillRect(-gk.width/2 - 40, -10, 40, 20); 
+            ctx.fillRect(gk.width/2, -10, 40, 20);      
+        }
+
+        ctx.restore();
+    }
+
+    function drawBall() {
+        ctx.save();
+        ctx.translate(ball.x, ball.y);
+        
+        if (pState === 'kicked') {
+            ctx.rotate(pProgress * Math.PI * 4 * (kickDir === 'right' ? 1 : -1));
+        }
+
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(0, 0, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#000';
+        ctx.stroke();
+
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(0, 0, ball.r * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        for(let i = 0; i < 5; i++) {
+            let angle = (i * Math.PI * 2) / 5;
+            let startX = Math.cos(angle) * (ball.r * 0.4);
+            let startY = Math.sin(angle) * (ball.r * 0.4);
+            let endX = Math.cos(angle) * ball.r;
+            let endY = Math.sin(angle) * ball.r;
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    function evaluatePenalty() {
+        const display = document.getElementById('display-penalty');
+        const scoreBoard = document.getElementById('penalty-score');
+        
+        if (kickDir !== gkDir) {
+            display.textContent = 'GOL!';
+            pGoals++;
+            speakText('Gol!');
+        } else {
+            display.textContent = 'PARATA!';
+            pSaves++;
+            speakText('Parata!');
+        }
+        
+        scoreBoard.textContent = 'Gol: ' + pGoals + ' - Parate: ' + pSaves;
+        
+        setTimeout(() => {
+            if(currentAppMode === 'penalty') {
+                initPenalty();
+            }
+        }, 2200);
+    }
+
+    // --- Gestione Eventi Globali ---
+    document.addEventListener('keydown', (e) => {
+        if (!currentAppMode) return; 
+
+        if (e.code === 'Space') {
+            e.preventDefault();
+            if (isSpaceLocked) return;
+            isSpaceLocked = true;
+        } else if (e.code === 'Enter') {
+            e.preventDefault();
+            if (isEnterLocked) return;
+            isEnterLocked = true;
+        } else {
+            return; 
+        }
+
+        if (currentAppMode === 'scan') {
+            if (mode === 'manual') {
+                if (e.code === 'Space') moveNext();
+                if (e.code === 'Enter') selectCurrent();
+            } else if (mode === 'auto') {
                 selectCurrent();
             }
-        } else if (mode === 'auto') {
-            if (e.code === 'Space' || e.code === 'Enter') {
-                e.preventDefault();
-                selectCurrent();
-            }
+        } else if (currentAppMode === 'run') {
+            handleRunAction(e.code);
+        } else if (currentAppMode === 'penalty') {
+            handlePenaltyAction(e.code);
         }
     });
 
-    // Intercettazione dei click del mouse
+    document.addEventListener('keyup', (e) => {
+        if (e.code === 'Space') {
+            isSpaceLocked = false;
+        } else if (e.code === 'Enter') {
+            isEnterLocked = false;
+        }
+    });
+
     document.addEventListener('click', (e) => {
-        if (!isScanning) return;
-        
-        const clickedEl = e.target.closest('.scannable');
-        if (clickedEl) {
-            const index = scanElements.indexOf(clickedEl);
-            if (index !== -1) {
-                currentIndex = index;
-                updateHighlight();
-                selectCurrent();
+        if (currentAppMode === 'scan') {
+            const clickedEl = e.target.closest('.scannable');
+            if (clickedEl) {
+                const index = scanElements.indexOf(clickedEl);
+                if (index !== -1) {
+                    currentIndex = index;
+                    updateHighlight();
+                    selectCurrent();
+                }
             }
         }
     });
